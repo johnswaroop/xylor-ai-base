@@ -24,13 +24,304 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { type TaggedContext } from "@/lib/mock-data";
-import {
-  useProjects,
-  useTasks,
-  useIssues,
-  useCommunications,
-} from "@/lib/hooks/use-frappe-data";
+import { MarkdownRenderer } from "@/components/ui/markdown-renderer";
+// Hardcoded demo data
+const projects = [
+  {
+    name: "PROJ-001",
+    project_name: "Website Redesign",
+    status: "Open",
+    percent_complete: 65,
+    expected_end_date: "2024-02-15",
+    customer: "Acme Corp",
+    project_type: "External",
+    creation: "2024-01-01T10:00:00Z",
+    modified: "2024-01-10T14:30:00Z",
+  },
+  {
+    name: "PROJ-002",
+    project_name: "Mobile App Development",
+    status: "Open",
+    percent_complete: 30,
+    expected_end_date: "2024-03-30",
+    customer: "TechStart Inc",
+    project_type: "External",
+    creation: "2024-01-05T09:00:00Z",
+    modified: "2024-01-09T16:45:00Z",
+  },
+  {
+    name: "PROJ-003",
+    project_name: "ERP Implementation",
+    status: "Open",
+    percent_complete: 85,
+    expected_end_date: "2024-01-25",
+    customer: "Global Solutions",
+    project_type: "Internal",
+    creation: "2023-12-15T08:00:00Z",
+    modified: "2024-01-11T09:15:00Z",
+  },
+  {
+    name: "PROJ-004",
+    project_name: "Security Audit",
+    status: "Completed",
+    percent_complete: 100,
+    expected_end_date: "2024-01-10",
+    customer: "SecureBank",
+    project_type: "External",
+    creation: "2023-12-01T10:00:00Z",
+    modified: "2024-01-10T17:00:00Z",
+  },
+];
+
+const tasks = [
+  {
+    name: "TASK-001",
+    subject: "Design Homepage Layout",
+    status: "Completed",
+    priority: "High",
+    exp_start_date: "2024-01-01",
+    exp_end_date: "2024-01-05",
+    progress: 100,
+    project: "PROJ-001",
+    creation: "2024-01-01T10:00:00Z",
+    modified: "2024-01-05T17:00:00Z",
+  },
+  {
+    name: "TASK-002",
+    subject: "Implement User Authentication",
+    status: "Working",
+    priority: "High",
+    exp_start_date: "2024-01-06",
+    exp_end_date: "2024-01-12",
+    progress: 75,
+    project: "PROJ-001",
+    creation: "2024-01-06T09:00:00Z",
+    modified: "2024-01-11T14:30:00Z",
+  },
+  {
+    name: "TASK-003",
+    subject: "Setup Database Schema",
+    status: "Overdue",
+    priority: "Urgent",
+    exp_start_date: "2024-01-03",
+    exp_end_date: "2024-01-08",
+    progress: 40,
+    project: "PROJ-001",
+    creation: "2024-01-03T08:00:00Z",
+    modified: "2024-01-09T12:00:00Z",
+  },
+  {
+    name: "TASK-004",
+    subject: "Mobile UI Framework Setup",
+    status: "Open",
+    priority: "Medium",
+    exp_start_date: "2024-01-15",
+    exp_end_date: "2024-01-20",
+    progress: 0,
+    project: "PROJ-002",
+    creation: "2024-01-10T11:00:00Z",
+    modified: "2024-01-10T11:00:00Z",
+  },
+  {
+    name: "TASK-005",
+    subject: "API Integration Testing",
+    status: "Working",
+    priority: "High",
+    exp_start_date: "2024-01-08",
+    exp_end_date: "2024-01-15",
+    progress: 60,
+    project: "PROJ-002",
+    creation: "2024-01-08T10:00:00Z",
+    modified: "2024-01-11T16:00:00Z",
+  },
+  {
+    name: "TASK-006",
+    subject: "Data Migration Scripts",
+    status: "Completed",
+    priority: "High",
+    exp_start_date: "2023-12-20",
+    exp_end_date: "2024-01-05",
+    progress: 100,
+    project: "PROJ-003",
+    creation: "2023-12-20T09:00:00Z",
+    modified: "2024-01-05T18:00:00Z",
+  },
+  {
+    name: "TASK-007",
+    subject: "User Training Documentation",
+    status: "Working",
+    priority: "Medium",
+    exp_start_date: "2024-01-08",
+    exp_end_date: "2024-01-20",
+    progress: 80,
+    project: "PROJ-003",
+    creation: "2024-01-08T08:00:00Z",
+    modified: "2024-01-11T10:00:00Z",
+  },
+  {
+    name: "TASK-008",
+    subject: "Security Penetration Testing",
+    status: "Completed",
+    priority: "Urgent",
+    exp_start_date: "2023-12-05",
+    exp_end_date: "2024-01-08",
+    progress: 100,
+    project: "PROJ-004",
+    creation: "2023-12-05T09:00:00Z",
+    modified: "2024-01-08T16:00:00Z",
+  },
+];
+
+const issues = [
+  {
+    name: "ISS-001",
+    subject: "Login page not responsive on mobile",
+    status: "Open",
+    priority: "High",
+    issue_type: "Bug",
+    opening_date: "2024-01-10T10:30:00Z",
+    project: "PROJ-001",
+    creation: "2024-01-10T10:30:00Z",
+    modified: "2024-01-10T15:00:00Z",
+  },
+  {
+    name: "ISS-002",
+    subject: "Add dark mode toggle",
+    status: "Replied",
+    priority: "Medium",
+    issue_type: "Feature",
+    opening_date: "2024-01-09T14:15:00Z",
+    project: "PROJ-001",
+    creation: "2024-01-09T14:15:00Z",
+    modified: "2024-01-10T09:30:00Z",
+  },
+  {
+    name: "ISS-003",
+    subject: "Database connection timeout",
+    status: "Resolved",
+    priority: "Urgent",
+    issue_type: "Bug",
+    opening_date: "2024-01-08T09:45:00Z",
+    project: "PROJ-001",
+    creation: "2024-01-08T09:45:00Z",
+    modified: "2024-01-09T16:30:00Z",
+  },
+  {
+    name: "ISS-004",
+    subject: "App crashes on iOS 15",
+    status: "Open",
+    priority: "High",
+    issue_type: "Bug",
+    opening_date: "2024-01-11T11:20:00Z",
+    project: "PROJ-002",
+    creation: "2024-01-11T11:20:00Z",
+    modified: "2024-01-11T11:20:00Z",
+  },
+  {
+    name: "ISS-005",
+    subject: "Slow ERP module loading",
+    status: "Working",
+    priority: "Medium",
+    issue_type: "Performance",
+    opening_date: "2024-01-09T13:00:00Z",
+    project: "PROJ-003",
+    creation: "2024-01-09T13:00:00Z",
+    modified: "2024-01-11T14:00:00Z",
+  },
+];
+
+const communications = [
+  {
+    name: "COMM-001",
+    communication_type: "Email",
+    content:
+      "Hi team, please review the latest homepage designs. The client has requested some changes to the color scheme and wants to see a darker theme option. Let's schedule a call to discuss the implementation timeline.",
+    sender: "client@acmecorp.com",
+    recipients: ["john.doe@company.com", "jane.smith@company.com"],
+    subject: "Homepage Design Review - Color Scheme Changes",
+    reference_doctype: "Project",
+    reference_name: "PROJ-001",
+    communication_date: "2024-01-10T14:30:00Z",
+    creation: "2024-01-10T14:30:00Z",
+    modified: "2024-01-10T14:30:00Z",
+  },
+  {
+    name: "COMM-002",
+    communication_type: "Call",
+    content:
+      "Call with client regarding mobile responsiveness issues. Duration: 45 minutes. Key points discussed: Need to prioritize mobile-first design approach, fix login page issues by end of week, consider implementing progressive web app features.",
+    sender: "jane.smith@company.com",
+    recipients: ["client@acmecorp.com"],
+    subject: "Mobile Responsiveness Discussion",
+    reference_doctype: "Issue",
+    reference_name: "ISS-001",
+    communication_date: "2024-01-10T16:00:00Z",
+    creation: "2024-01-10T16:00:00Z",
+    modified: "2024-01-10T16:00:00Z",
+  },
+  {
+    name: "COMM-003",
+    communication_type: "Chat",
+    content:
+      "Quick sync on database schema progress. Bob mentioned the connection timeout issue has been resolved with the new connection pooling implementation. We can now move forward with the authentication system integration.",
+    sender: "john.doe@company.com",
+    recipients: ["bob.wilson@company.com", "jane.smith@company.com"],
+    subject: "Database Schema Update",
+    reference_doctype: "Task",
+    reference_name: "TASK-002",
+    communication_date: "2024-01-09T10:15:00Z",
+    creation: "2024-01-09T10:15:00Z",
+    modified: "2024-01-09T10:15:00Z",
+  },
+  {
+    name: "COMM-004",
+    communication_type: "Email",
+    content:
+      "Weekly project status update: Website redesign is 65% complete. Homepage design has been finalized and approved. Authentication system implementation is in progress with 75% completion. Database schema setup encountered some delays but is now resolved. Expected completion remains on track for Feb 15th.",
+    sender: "john.doe@company.com",
+    recipients: ["client@acmecorp.com", "manager@company.com"],
+    subject: "Weekly Status Update - Website Redesign",
+    reference_doctype: "Project",
+    reference_name: "PROJ-001",
+    communication_date: "2024-01-11T09:00:00Z",
+    creation: "2024-01-11T09:00:00Z",
+    modified: "2024-01-11T09:00:00Z",
+  },
+  {
+    name: "COMM-005",
+    communication_type: "Email",
+    content:
+      "ERP implementation is nearing completion at 85%. Data migration scripts have been successfully tested and deployed. Currently working on user training documentation and final system testing. Go-live date confirmed for Jan 25th.",
+    sender: "sarah.johnson@company.com",
+    recipients: ["manager@globalsolutions.com"],
+    subject: "ERP Implementation - Final Phase Update",
+    reference_doctype: "Project",
+    reference_name: "PROJ-003",
+    communication_date: "2024-01-11T13:30:00Z",
+    creation: "2024-01-11T13:30:00Z",
+    modified: "2024-01-11T13:30:00Z",
+  },
+  {
+    name: "COMM-006",
+    communication_type: "Chat",
+    content:
+      "Mobile app framework setup is ready to begin. Alice has completed the research phase and identified React Native as the best option for cross-platform development. Starting development next week.",
+    sender: "alice.brown@company.com",
+    recipients: ["charlie.davis@company.com"],
+    subject: "Mobile Framework Decision",
+    reference_doctype: "Task",
+    reference_name: "TASK-004",
+    communication_date: "2024-01-11T15:45:00Z",
+    creation: "2024-01-11T15:45:00Z",
+    modified: "2024-01-11T15:45:00Z",
+  },
+];
+
+export interface TaggedContext {
+  type: "project" | "task" | "issue" | "communication";
+  id: string;
+  name: string;
+}
 
 export default function AIAssistantPage() {
   const [taggedContext, setTaggedContext] = useState<TaggedContext[]>([]);
@@ -42,33 +333,17 @@ export default function AIAssistantPage() {
 
   const { messages, input, handleInputChange, handleSubmit, isLoading, stop } =
     useChat({
-      api: "/xylor-ai/api/chat",
+      api: "/api/chat",
       body: {
         taggedContext: taggedContext,
       },
     });
 
-  // Use real Frappe data for all entities
-  const {
-    data: projects = [],
-    isLoading: projectsLoading,
-    error: projectsError,
-  } = useProjects();
-  const {
-    data: tasks = [],
-    isLoading: tasksLoading,
-    error: tasksError,
-  } = useTasks();
-  const {
-    data: issues = [],
-    isLoading: issuesLoading,
-    error: issuesError,
-  } = useIssues();
-  const {
-    data: communications = [],
-    isLoading: communicationsLoading,
-    error: communicationsError,
-  } = useCommunications();
+  // Using hardcoded demo data - no loading states needed
+  const projectsLoading = false;
+  const tasksLoading = false;
+  const issuesLoading = false;
+  const communicationsLoading = false;
 
   const toggleProjectExpansion = (projectId: string) => {
     setExpandedProjects((prev) => {
@@ -388,31 +663,10 @@ export default function AIAssistantPage() {
               </div>
             )}
 
-            {/* Error State */}
-            {(projectsError ||
-              tasksError ||
-              issuesError ||
-              communicationsError) && (
-              <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-start">
-                  <AlertCircle className="h-5 w-5 text-red-600 mr-3 mt-0.5" />
-                  <div className="text-sm text-red-800">
-                    <div className="font-medium mb-1">Error loading data</div>
-                    {projectsError && (
-                      <div>• Projects: {projectsError.message}</div>
-                    )}
-                    {tasksError && <div>• Tasks: {tasksError.message}</div>}
-                    {issuesError && <div>• Issues: {issuesError.message}</div>}
-                    {communicationsError && (
-                      <div>• Communications: {communicationsError.message}</div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Error State - Not needed for demo with hardcoded data */}
 
             {/* Project List */}
-            {!isAnyLoading && !projectsError && (
+            {!isAnyLoading && (
               <div className="px-6 py-4 space-y-3">
                 {projects.map((project) => {
                   const projectTasks = getTasksByProject(project.name);
@@ -516,19 +770,10 @@ export default function AIAssistantPage() {
                                 <Circle className="h-4 w-4" />
                                 <span>{projectTasks.length} total tasks</span>
                               </div>
-                              {!issuesError ? (
-                                <div className="flex items-center gap-2 text-gray-600">
-                                  <AlertCircle className="h-4 w-4 text-orange-500" />
-                                  <span>{openIssues.length} issues</span>
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-2 text-orange-600">
-                                  <AlertCircle className="h-4 w-4" />
-                                  <span className="text-xs">
-                                    Issues unavailable
-                                  </span>
-                                </div>
-                              )}
+                              <div className="flex items-center gap-2 text-gray-600">
+                                <AlertCircle className="h-4 w-4 text-orange-500" />
+                                <span>{openIssues.length} issues</span>
+                              </div>
                             </div>
                           </div>
 
@@ -697,20 +942,7 @@ export default function AIAssistantPage() {
                               </div>
                             )}
 
-                            {/* Issues Error State */}
-                            {issuesError && (
-                              <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                                <div className="text-sm text-orange-800">
-                                  <div className="font-medium flex items-center gap-2">
-                                    <AlertCircle className="h-4 w-4" />
-                                    Issues temporarily unavailable
-                                  </div>
-                                  <div className="text-xs text-orange-600 mt-1">
-                                    {issuesError.message}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
+                            {/* Issues Error State - Not needed for demo */}
                           </div>
                         </div>
                       )}
@@ -750,21 +982,10 @@ export default function AIAssistantPage() {
               </div>
             )}
 
-            {/* Error State */}
-            {communicationsError && (
-              <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <div className="flex items-start">
-                  <AlertCircle className="h-5 w-5 text-red-600 mr-3 mt-0.5" />
-                  <div className="text-sm text-red-800">
-                    <div className="font-medium mb-1">Messages unavailable</div>
-                    <div className="text-xs">{communicationsError.message}</div>
-                  </div>
-                </div>
-              </div>
-            )}
+            {/* Error State - Not needed for demo */}
 
             {/* Communications List */}
-            {!communicationsLoading && !communicationsError && (
+            {!communicationsLoading && (
               <div className="px-6 py-4 space-y-3">
                 {filteredCommunications.length === 0 ? (
                   <div className="text-center py-12">
@@ -952,12 +1173,20 @@ export default function AIAssistantPage() {
                         : "bg-gray-100 text-gray-900 border border-gray-200"
                     }`}
                   >
-                    <div className="whitespace-pre-wrap text-sm">
-                      {message.content}
-                      {isStreaming && (
-                        <span className="inline-block w-2 h-4 bg-current opacity-75 animate-pulse ml-1" />
-                      )}
-                    </div>
+                    {isUser ? (
+                      <div className="whitespace-pre-wrap text-sm">
+                        {message.content}
+                      </div>
+                    ) : (
+                      <div className="text-sm">
+                        <MarkdownRenderer>
+                          {message.content + (isStreaming ? "..." : "")}
+                        </MarkdownRenderer>
+                        {isStreaming && (
+                          <span className="inline-block w-2 h-4 bg-current opacity-75 animate-pulse ml-1" />
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
